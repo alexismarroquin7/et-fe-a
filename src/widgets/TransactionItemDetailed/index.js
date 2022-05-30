@@ -1,8 +1,7 @@
-import { Grid } from "../../components"
+import { Grid } from "../../components";
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ArrowForward } from "@mui/icons-material";
 
 const amountAsDollar = (amt) => {
   if(amt < 0){
@@ -14,7 +13,7 @@ const amountAsDollar = (amt) => {
   }
 }
 
-export const TransactionItem = ({transaction, index}) => {
+export const TransactionItemDetailed = ({ transaction }) => {
   const [hidden, setHidden] = useState({
     description: true
   });
@@ -37,21 +36,12 @@ export const TransactionItem = ({transaction, index}) => {
     container
     ff="col"
     ai="center"
-    bgColor={index % 2 === 0 ? "#eeeeee" : "#ffffff"}
+    bgColor="#eeeeee"
     padding="1rem 0"
+    onClick={() => {
+      navigate(`/transactions/${id}`)
+    }}
   >
-    <Grid
-      width="90%"
-      jc="flex-end"
-      ai="center"
-    >
-      <ArrowForward
-        onClick={() => {
-          navigate(`/transactions/${id}`)
-        }}
-      />
-    </Grid>
-
     <Grid
       width="90%"
       jc="space-between"
@@ -131,7 +121,7 @@ export const TransactionItem = ({transaction, index}) => {
         <Grid
           width="100%"
           borderRadius="5px"
-          bgColor={index % 2 === 0 ? "#fff" : "#eee"}
+          bgColor="#fff"
         >
           <p
             style={{

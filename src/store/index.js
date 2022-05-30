@@ -25,13 +25,13 @@ const createStore = () => {
   const store = configureStore({
     reducer: rootReducer,
     middleware,
-    preloadedState: localStorage.getItem('redux-state')
-    ? JSON.parse(localStorage.getItem('redux-state'))
+    preloadedState: localStorage.getItem('et-fe-a-redux-state')
+    ? JSON.parse(localStorage.getItem('et-fe-a-redux-state'))
     : {}
   });
   
   store.subscribe(() => {
-    localStorage.setItem('redux-state', JSON.stringify(store.getState()))
+    localStorage.setItem('et-fe-a-redux-state', JSON.stringify(store.getState()))
   });
   
   return store;

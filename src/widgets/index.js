@@ -1,3 +1,5 @@
 export * from "./TransactionForm"
 export * from "./LoginForm"
 export * from "./TransactionList"
+export * from "./TransactionItem"
+export * from "./TransactionItemDetailed"

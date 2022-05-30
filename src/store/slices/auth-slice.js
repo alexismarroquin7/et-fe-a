@@ -27,11 +27,15 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-
+    logout(state){
+      localStorage.removeItem('et-fe-a-token');
+      return state = initialState;
+    }
   },
   extraReducers: {
     [login.pending]: (state) => {
       state.loading = true;
+      state.error.message = '';
     },
     [login.fulfilled]: (state, { payload }) => {
       state.loading = false;
@@ -39,11 +43,13 @@ export const authSlice = createSlice({
       state.error.message = '';
       state.user = payload.user;
       state.token = payload.token;
-      localStorage.setItem('token', payload.token);
+      localStorage.setItem('et-fe-a-token', payload.token);
     },
     [login.rejected]: (state, { payload }) => {
       state.loading = false;
       state.error.message = payload.error.message;
-    },
+    }
   }
 });
+
+export const { logout } = authSlice.actions;

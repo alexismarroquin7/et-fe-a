@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Button, Form, Grid } from "../../components"
 import { axiosInstance as axios } from "../../utils";
+import { create } from "../../store/slices/transaction-slice";
 
 const initialValues = {
   name: '',
@@ -36,15 +38,7 @@ const initialOptions = {
     {
       name: '--select--',
       value: ''
-    },
-    {
-      name: 'Deposit',
-      value: 'deposit'
-    },
-    {
-      name: 'Withdrawal',
-      value: 'withdrawal'
-    },
+    }
   ],
   categories: [
     {
@@ -59,6 +53,11 @@ export const TransactionForm = () => {
   const [values, setValues] = useState(initialValues);
   const [options, setOptions] = useState(initialOptions);
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const auth = useSelector(s => s.auth);
+
   const handleChange = e => {
     setValues({
       ...values,
@@ -68,13 +67,33 @@ export const TransactionForm = () => {
   
   const handleSubmit = e => {
     e.preventDefault();
-    console.log(values);
+    const valid = () => {
+      let status = true;
+
+      if(
+        values.date === '' ||
+        values.userUUID === '' ||
+        values.category === '' ||
+        values.amount === '' ||
+        values.type === ''
+      ){
+        status = false
+      }
+
+      return status
+    }
+  
+    if(!valid()) return;
+
+    dispatch(create(values));
+
   }
 
   useEffect(() => {
     setValues(v => {
       return {
         ...v,
+        userUUID: auth.user.id,
         date: today()
       }
     });
@@ -83,8 +102,21 @@ export const TransactionForm = () => {
       try {
         const res = await axios().get('/transaction_categories');
         setOptions(o => {
-          return { ...o, categories: [ o.categories[0], ...res.data ] } 
+          return {
+            ...o,
+            categories: [
+              o.categories[0],
+              ...res.data
+              .map(cat => {
+                  return {
+                  name: cat.name,
+                  value: cat.name
+                }
+              })
+            ] 
+          } 
         });
+
       } catch (err) {
         console.log(err);
       }
@@ -94,7 +126,16 @@ export const TransactionForm = () => {
       try {
         const res = await axios().get('/transaction_types');
         setOptions(o => {
-          return { ...o, types: [ o.types[0], ...res.data ] } 
+          return {
+            ...o,
+            types: [
+              o.types[0],
+              ...res.data
+              .map(type => {
+                return { name: type.name, value: type.name } 
+              })
+            ] 
+          } 
         });
       } catch (err) {
         console.log(err);
@@ -108,7 +149,7 @@ export const TransactionForm = () => {
 
     fetchOptions();
 
-  }, [])
+  }, [auth.user.id])
 
   return <Form
     onSubmit={handleSubmit}
