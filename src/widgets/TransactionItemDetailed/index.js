@@ -1,9 +1,14 @@
 import { Grid } from "../../components";
-import AddIcon from '@mui/icons-material/Add';
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+import AddIcon from '@mui/icons-material/Add';
+
 const amountAsDollar = (amt) => {
+  if(!amt){
+    return ''
+  }
+
   if(amt < 0){
     let str = String(amt);
     str = str.slice(1, str.length);
@@ -14,6 +19,7 @@ const amountAsDollar = (amt) => {
 }
 
 export const TransactionItemDetailed = ({ transaction }) => {
+  
   const [hidden, setHidden] = useState({
     description: true
   });

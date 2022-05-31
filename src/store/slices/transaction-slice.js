@@ -8,7 +8,15 @@ const initialState = {
   },
   list: [],
   item: {
-    id: null
+    id: null,
+    properties: {
+      name: {},
+      description: {},
+      date: {},
+      amount: {},
+      type: {},
+      category: {},
+    }
   }
 }
 
@@ -61,6 +69,38 @@ export const findByTransactionId = createAsyncThunk(
   }
 );
 
+export const deleteByTransactionId = createAsyncThunk(
+  'transaction/deleteByTransactionId',
+  async (transaction_id, { rejectWithValue }) => {
+    try {
+      const res = await axios().delete(`/transactions/${transaction_id}`);
+      return { transaction: res.data };
+    } catch (err) {
+      return rejectWithValue({
+        error: {
+          message: err.response.data.message
+        } 
+      });
+    }
+  }
+)
+
+export const updateByTransactionId = createAsyncThunk(
+  'transaction/updateByTransactionId',
+  async ({transaction_id, changes}, { rejectWithValue }) => {
+    try {
+      const res = await axios().put(`/transactions/${transaction_id}`, changes);
+      return { transaction: res.data };
+    } catch (err) {
+      return rejectWithValue({
+        error: {
+          message: err.response.data.message
+        } 
+      });
+    }
+  }
+)
+
 export const transactionSlice = createSlice({
   name: 'transaction',
   initialState,
@@ -106,6 +146,39 @@ export const transactionSlice = createSlice({
       state.item = { ...payload.transaction };
     },
     [findByTransactionId.rejected]: (state, { payload }) => {
+      state.loading = false;
+      state.error.message = payload.error.message;
+    },
+    [deleteByTransactionId.pending]: (state) => {
+      state.loading = true;
+      state.error.message = '';
+    },
+    [deleteByTransactionId.fulfilled]: (state, { payload }) => {
+      state.loading = true;
+      state.error.message = '';
+      state.list = state.list.filter(item => item.id !== payload.transaction.id);
+    },
+    [deleteByTransactionId.rejected]: (state, { payload }) => {
+      state.loading = true;
+      state.error.message = payload.error.message;
+    },
+    [updateByTransactionId.pending]: (state) => {
+      state.loading = true;
+      state.error.message = '';
+    },
+    [updateByTransactionId.fulfilled]: (state, { payload }) => {
+      state.loading = false;
+      state.error.message = '';
+      state.list = state.list.map(item => {
+        
+        if(item.id === payload.transaction.id) {
+          item = payload.transaction;
+        }
+        
+        return item;
+      });
+    },
+    [updateByTransactionId.rejected]: (state, { payload }) => {
       state.loading = false;
       state.error.message = payload.error.message;
     },

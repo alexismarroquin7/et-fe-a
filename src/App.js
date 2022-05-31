@@ -4,6 +4,7 @@ import './App.css';
 import { Home, Login, Transactions } from './pages';
 import { NewTransaction } from './pages/new/transaction';
 import { Transaction } from './pages/transactions/[transaction_id]';
+import { EditTransaction } from './pages/transactions/[transaction_id]/edit';
 import { PrivateRoute } from "./components";
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
           element={
             <PrivateRoute>
               <Transaction/>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/transactions/:transaction_id/edit"
+          element={
+            <PrivateRoute>
+              <EditTransaction/>
             </PrivateRoute>
           }
         />
