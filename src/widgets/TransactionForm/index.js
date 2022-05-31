@@ -1,37 +1,8 @@
+import { CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Button, Form, Grid } from "../../components"
 import { axiosInstance as axios } from "../../utils";
-import { create } from "../../store/slices/transaction-slice";
-
-const initialValues = {
-  name: '',
-  description: '',
-  date: '',
-  userUUID: '',
-  category: '',
-  amount: '',
-  type: ''
-};
-
-const today = () => {
-  const date = new Date();
-
-  const year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let currDate = date.getDate();
-
-  if(month < 10) {
-    month = `0${month}`
-  }
-
-  if(currDate < 10) {
-    currDate = `0${currDate}`
-  }
-
-  return `${year}-${month}-${currDate}`;
-}
 
 const initialOptions = {
   types: [
@@ -48,15 +19,20 @@ const initialOptions = {
   ]
 }
 
-export const TransactionForm = () => {
+export const TransactionForm = (
+  {
+    values,
+    setValues,
+    onSubmit,
+    loading = false,
+    button,
+    helperText = ''
+  }
+) => {
 
-  const [values, setValues] = useState(initialValues);
   const [options, setOptions] = useState(initialOptions);
+  
   const navigate = useNavigate();
-
-  const dispatch = useDispatch();
-
-  const auth = useSelector(s => s.auth);
 
   const handleChange = e => {
     setValues({
@@ -67,37 +43,10 @@ export const TransactionForm = () => {
   
   const handleSubmit = e => {
     e.preventDefault();
-    const valid = () => {
-      let status = true;
-
-      if(
-        values.date === '' ||
-        values.userUUID === '' ||
-        values.category === '' ||
-        values.amount === '' ||
-        values.type === ''
-      ){
-        status = false
-      }
-
-      return status
-    }
-  
-    if(!valid()) return;
-
-    dispatch(create(values));
-
+    onSubmit();
   }
 
   useEffect(() => {
-    setValues(v => {
-      return {
-        ...v,
-        userUUID: auth.user.id,
-        date: today()
-      }
-    });
-
     const fetchCategoryOptions = async () => {
       try {
         const res = await axios().get('/transaction_categories');
@@ -149,7 +98,7 @@ export const TransactionForm = () => {
 
     fetchOptions();
 
-  }, [auth.user.id])
+  }, [])
 
   return <Form
     onSubmit={handleSubmit}
@@ -255,6 +204,14 @@ export const TransactionForm = () => {
         onChange={handleChange}
       />  
     </Grid>
+    
+    {helperText.length > 0 && <Grid
+      width="90%"
+      ff="col"
+      ai="center"
+    >
+      <p style={{color: 'red'}}>{helperText}</p>
+    </Grid>}
 
     <Grid
       width="90%"
@@ -266,16 +223,27 @@ export const TransactionForm = () => {
         padding=".5rem 1rem"
         borderRadius="50px"
         color="#4285F4"
-        onClick={() => navigate('/transactions')}
-      >Cancel</Button>
+        onClick={() => navigate(button.back.href)}
+      >{button.back.text}</Button>
       <Button
+        width="5rem"
         border="1px solid #4285F4"
         padding=".5rem 1rem"
         borderRadius="50px"
         color="white"
         bgColor="#4285F4"
         type="submit"
-      >Submit</Button>
+        jc="center"
+      >
+        {
+          loading 
+          ? <CircularProgress
+            sx={{ color: 'white' }}
+            size={"1rem"}
+          />
+          : 'Submit'
+        }
+      </Button>
     </Grid>
   </Form>
 }

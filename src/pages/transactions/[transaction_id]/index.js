@@ -3,11 +3,11 @@ import { Box, CircularProgress, Menu, MenuItem, Modal } from "@mui/material";
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import { Button, Grid } from "../../components"
-import { findByTransactionId, deleteByTransactionId } from "../../store/slices/transaction-slice";
-import { TransactionItemDetailed } from "../../widgets";
+import { Button, Grid } from "../../../components"
+import { findByTransactionId, deleteByTransactionId } from "../../../store/slices/transaction-slice";
+import { TransactionItemDetailed } from "../../../widgets";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import UpgradeIcon from '@mui/icons-material/Upgrade';
+import EditIcon from '@mui/icons-material/Edit';
 
 const classes = {
   modal: {
@@ -81,14 +81,18 @@ export const Transaction = () => {
         onClose={() => setOptionsMenuAnchorEl(null)}
         anchorEl={optionsMenuAnchorEl}
       >
-        <MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate(`/transactions/${params.transaction_id}/edit`);
+          }}
+        >
         
           <Grid
             ai="center"
             gap=".5rem"
           >
-            <UpgradeIcon/>
-            <p>Update</p>
+            <EditIcon/>
+            <p>Edit</p>
           </Grid>
         
         </MenuItem>
@@ -162,7 +166,8 @@ export const Transaction = () => {
     
     ) : ''}
     
-    {trx.item.id === null 
+    {trx.item.id === null ||
+    trx.loading
     ? '' 
     : (
       <TransactionItemDetailed
